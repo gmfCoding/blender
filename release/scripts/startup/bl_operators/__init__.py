@@ -14,6 +14,7 @@ _modules = [
     "clip",
     "console",
     "constraint",
+    "control_nodes",
     "file",
     "geometry_nodes",
     "image",

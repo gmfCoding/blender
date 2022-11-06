@@ -84,6 +84,7 @@ typedef enum ModifierType {
   eModifierType_MeshToVolume = 58,
   eModifierType_VolumeDisplace = 59,
   eModifierType_VolumeToMesh = 60,
+  eModifierType_ControlNodes = 61,
   NUM_MODIFIER_TYPES,
 } ModifierType;
 

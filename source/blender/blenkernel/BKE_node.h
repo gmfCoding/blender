@@ -379,6 +379,7 @@ typedef struct bNodeType {
 #define NODE_CLASS_SHADER 40
 #define NODE_CLASS_GEOMETRY 41
 #define NODE_CLASS_ATTRIBUTE 42
+#define NODE_CLASS_CONTROL 43
 #define NODE_CLASS_LAYOUT 100
 
 typedef enum eNodeSizePreset {
@@ -1580,6 +1581,10 @@ struct TexResult;
 #define FN_NODE_INPUT_INT 1220
 #define FN_NODE_SEPARATE_COLOR 1221
 #define FN_NODE_COMBINE_COLOR 1222
+
+
+
+#define CON_NODE_FRAME_EXEC 2201
 
 /** \} */
 

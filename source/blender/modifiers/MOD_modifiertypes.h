@@ -72,6 +72,7 @@ extern ModifierTypeInfo modifierType_MeshSequenceCache;
 extern ModifierTypeInfo modifierType_SurfaceDeform;
 extern ModifierTypeInfo modifierType_WeightedNormal;
 extern ModifierTypeInfo modifierType_Nodes;
+extern ModifierTypeInfo modifierType_ControlNodes;
 extern ModifierTypeInfo modifierType_MeshToVolume;
 extern ModifierTypeInfo modifierType_VolumeDisplace;
 extern ModifierTypeInfo modifierType_VolumeToMesh;

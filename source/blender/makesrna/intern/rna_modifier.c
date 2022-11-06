@@ -45,6 +45,7 @@
 #include "WM_types.h"
 
 #include "MOD_nodes.h"
+#include "MOD_control_nodes.h"
 
 const EnumPropertyItem rna_enum_object_modifier_type_items[] = {
     RNA_ENUM_ITEM_HEADING(N_("Modify"), NULL),
@@ -132,6 +133,7 @@ const EnumPropertyItem rna_enum_object_modifier_type_items[] = {
      "Edge Split",
      "Split away joined faces at the edges"},
     {eModifierType_Nodes, "NODES", ICON_GEOMETRY_NODES, "Geometry Nodes", ""},
+    {eModifierType_ControlNodes, "CONTROLNODES", ICON_GEOMETRY_NODES, "Control Nodes", ""},
     {eModifierType_Mask,
      "MASK",
      ICON_MOD_MASK,
@@ -1684,6 +1686,31 @@ static IDProperty **rna_NodesModifier_properties(PointerRNA *ptr)
   NodesModifierSettings *settings = &nmd->settings;
   return &settings->properties;
 }
+
+
+static bool rna_ControlNodesModifier_node_group_poll(PointerRNA *UNUSED(ptr), PointerRNA value)
+{
+  bNodeTree *ntree = value.data;
+  return ntree->type == NTREE_CONTROL;
+}
+
+static void rna_ControlNodesModifier_node_group_update(Main *bmain, Scene *scene, PointerRNA *ptr)
+{
+  Object *object = (Object *)ptr->owner_id;
+  NodesModifierData *nmd = ptr->data;
+  rna_Modifier_dependency_update(bmain, scene, ptr);
+  MOD_control_nodes_update_interface(object, nmd);
+}
+
+static IDProperty **rna_ControlNodesModifier_properties(PointerRNA *ptr)
+{
+  NodesModifierData *nmd = ptr->data;
+  NodesModifierSettings *settings = &nmd->settings;
+  return &settings->properties;
+}
+
+
+
 #else
 
 static void rna_def_property_subdivision_common(StructRNA *srna)
@@ -7011,6 +7038,29 @@ static void rna_def_modifier_nodes(BlenderRNA *brna)
   RNA_define_lib_overridable(false);
 }
 
+static void rna_def_modifier_control_nodes(BlenderRNA *brna)
+{
+  StructRNA *srna;
+  PropertyRNA *prop;
+
+  srna = RNA_def_struct(brna, "ControlNodesModifier", "Modifier");
+  RNA_def_struct_ui_text(srna, "Control Nodes Modifier", "");
+  RNA_def_struct_sdna(srna, "NodesModifierData");
+  RNA_def_struct_idprops_func(srna, "rna_ControlNodesModifier_properties");
+  RNA_def_struct_ui_icon(srna, ICON_GEOMETRY_NODES);
+
+  RNA_define_lib_overridable(true);
+
+  prop = RNA_def_property(srna, "node_group", PROP_POINTER, PROP_NONE);
+  // CHRIS_TODO: Do we need "Node Group" or "Control Node Group"? 
+  RNA_def_property_ui_text(prop, "Node Group", "Node group that controls what this modifier does");
+  RNA_def_property_pointer_funcs(prop, NULL, NULL, NULL, "rna_ControlNodesModifier_node_group_poll");
+  RNA_def_property_flag(prop, PROP_EDITABLE);
+  RNA_def_property_update(prop, 0, "rna_ControlNodesModifier_node_group_update");
+
+  RNA_define_lib_overridable(false);
+}
+
 static void rna_def_modifier_mesh_to_volume(BlenderRNA *brna)
 {
   StructRNA *srna;
@@ -7385,6 +7435,7 @@ void RNA_def_modifier(BlenderRNA *brna)
   rna_def_modifier_surfacedeform(brna);
   rna_def_modifier_weightednormal(brna);
   rna_def_modifier_nodes(brna);
+  rna_def_modifier_control_nodes(brna);
   rna_def_modifier_mesh_to_volume(brna);
   rna_def_modifier_volume_displace(brna);
   rna_def_modifier_volume_to_mesh(brna);

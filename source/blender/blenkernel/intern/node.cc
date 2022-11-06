@@ -74,6 +74,7 @@
 #include "NOD_function.h"
 #include "NOD_geometry.h"
 #include "NOD_geometry_nodes_lazy_function.hh"
+#include "NOD_control.h"
 #include "NOD_node_declaration.hh"
 #include "NOD_shader.h"
 #include "NOD_socket.h"
@@ -4882,6 +4883,12 @@ static void registerGeometryNodes()
   register_node_type_geo_volume_to_mesh();
 }
 
+static void registerControlNodes()
+{
+  register_node_type_con_group();
+  register_node_type_con_every_frame();
+}
+
 static void registerFunctionNodes()
 {
   register_node_type_fn_align_euler_to_vector();
@@ -4918,6 +4925,7 @@ void BKE_node_system_init()
   register_node_tree_type_sh();
   register_node_tree_type_tex();
   register_node_tree_type_geo();
+  register_node_tree_type_con();
 
   register_node_type_frame();
   register_node_type_reroute();
@@ -4928,6 +4936,7 @@ void BKE_node_system_init()
   registerShaderNodes();
   registerTextureNodes();
   registerGeometryNodes();
+  registerControlNodes();
   registerFunctionNodes();
 }
 

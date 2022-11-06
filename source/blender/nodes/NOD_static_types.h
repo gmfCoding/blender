@@ -427,6 +427,7 @@ DefNode(GeometryNode, GEO_NODE_VIEWER, def_geo_viewer, "VIEWER", Viewer, "Viewer
 DefNode(GeometryNode, GEO_NODE_VOLUME_CUBE, 0, "VOLUME_CUBE", VolumeCube, "Volume Cube", "Generate a dense volume with a field that controls the density at each grid voxel based on its position")
 DefNode(GeometryNode, GEO_NODE_VOLUME_TO_MESH, def_geo_volume_to_mesh, "VOLUME_TO_MESH", VolumeToMesh, "Volume to Mesh", "Generate a mesh on the \"surface\" of a volume")
 
+DefNode(ControlNode, CON_NODE_FRAME_EXEC, 0, "FRAME_EXEC", FrameExec, "Frame Exec", "Executes when a new frame has begun.")
 /* undefine macros */
 #undef DefNode
 

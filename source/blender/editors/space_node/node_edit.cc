@@ -61,6 +61,7 @@
 
 #include "NOD_composite.h"
 #include "NOD_geometry.h"
+#include "NOD_control.h"
 #include "NOD_shader.h"
 #include "NOD_texture.h"
 #include "node_intern.hh" /* own include */
@@ -482,6 +483,11 @@ bool ED_node_is_texture(SpaceNode *snode)
 bool ED_node_is_geometry(SpaceNode *snode)
 {
   return STREQ(snode->tree_idname, ntreeType_Geometry->idname);
+}
+
+bool ED_node_is_control(SpaceNode *snode)
+{
+  return STREQ(snode->tree_idname, ntreeType_Control->idname);
 }
 
 void ED_node_shader_default(const bContext *C, ID *id)

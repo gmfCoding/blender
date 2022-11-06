@@ -11,6 +11,7 @@ if "bpy" in locals():
 _modules = [
     "node_add_menu",
     "node_add_menu_geometry",
+    "node_add_menu_control",
     "properties_animviz",
     "properties_constraint",
     "properties_data_armature",

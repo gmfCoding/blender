@@ -38,6 +38,12 @@ class TextureNodeCategory(SortedNodeCategory):
     def poll(cls, context):
         return (context.space_data.type == 'NODE_EDITOR' and
                 context.space_data.tree_type == 'TextureNodeTree')
+        
+class ControlNodeCategory(SortedNodeCategory):
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'NODE_EDITOR' and
+                context.space_data.tree_type == 'ControlNodeTree')
 
 
 # Menu entry for node group tools.
@@ -53,6 +59,7 @@ node_tree_group_type = {
     'ShaderNodeTree': 'ShaderNodeGroup',
     'TextureNodeTree': 'TextureNodeGroup',
     'GeometryNodeTree': 'GeometryNodeGroup',
+    'ControlNodeTree': 'ControlNodeGroup',
 }
 
 
@@ -278,6 +285,19 @@ shader_node_categories = [
     ]),
 ]
 
+control_node_categories = [
+    # Control Nodes
+    ControlNodeCategory("CON_EVENTS", "Events", items=[
+        NodeItem("ControlNodeFrameExec"),
+    ]),
+    ControlNodeCategory("CON_NEW_GROUP", "Group", items=node_group_items),
+    ControlNodeCategory("CON_NEW_LAYOUT", "Layout", items=[
+        NodeItem("NodeFrame"),
+        NodeItem("NodeReroute"),
+    ]),
+]
+
+
 compositor_node_categories = [
     # Compositor Nodes
     CompositorNodeCategory("CMP_INPUT", "Input", items=[
@@ -454,12 +474,14 @@ def register():
     nodeitems_utils.register_node_categories('SHADER', shader_node_categories)
     nodeitems_utils.register_node_categories('COMPOSITING', compositor_node_categories)
     nodeitems_utils.register_node_categories('TEXTURE', texture_node_categories)
+    nodeitems_utils.register_node_categories('CONTROL', control_node_categories)
 
 
 def unregister():
     nodeitems_utils.unregister_node_categories('SHADER')
     nodeitems_utils.unregister_node_categories('COMPOSITING')
     nodeitems_utils.unregister_node_categories('TEXTURE')
+    nodeitems_utils.unregister_node_categories('CONTROL', control_node_categories)
 
 
 if __name__ == "__main__":

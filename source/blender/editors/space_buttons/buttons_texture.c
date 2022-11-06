@@ -203,7 +203,7 @@ static void buttons_texture_modifier_foreach(void *userData,
 {
   ListBase *users = userData;
 
-  if (md->type == eModifierType_Nodes) {
+  if (md->type == eModifierType_Nodes || md->type == eModifierType_ControlNodes) {
     NodesModifierData *nmd = (NodesModifierData *)md;
     if (nmd->node_group != NULL) {
       buttons_texture_modifier_geonodes_users_add(ob, nmd, nmd->node_group, users);

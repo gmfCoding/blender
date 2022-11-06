@@ -24,6 +24,8 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   endif()
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 cmake_minimum_required(VERSION 3.10)
 
 if(NOT EXECUTABLE_OUTPUT_PATH)

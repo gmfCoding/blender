@@ -139,6 +139,22 @@ static void get_context_path_node_geometry(const bContext &C,
   }
 }
 
+static void get_context_path_node_control(const bContext &C,
+                                           SpaceNode &snode,
+                                           Vector<ui::ContextPathItem> &path)
+{
+  if (snode.flag & SNODE_PIN) {
+    context_path_add_node_tree_and_node_groups(snode, path);
+  }
+  else {
+    Object *object = CTX_data_active_object(&C);
+    ui::context_path_add_generic(path, RNA_Object, object);
+    ModifierData *modifier = BKE_object_active_modifier(object);
+    ui::context_path_add_generic(path, RNA_Modifier, modifier, ICON_GEOMETRY_NODES);
+    context_path_add_node_tree_and_node_groups(snode, path);
+  }
+}
+
 Vector<ui::ContextPathItem> context_path_for_space_node(const bContext &C)
 {
   SpaceNode *snode = CTX_wm_space_node(&C);
@@ -147,8 +163,10 @@ Vector<ui::ContextPathItem> context_path_for_space_node(const bContext &C)
   }
 
   Vector<ui::ContextPathItem> context_path;
-
-  if (snode->edittree->type == NTREE_GEOMETRY) {
+  // CHRIS_TODO: VERIFY NTREE_CONTROL case
+  if (snode->edittree->type == NTREE_CONTROL) {
+    get_context_path_node_control(C, *snode, context_path);
+  }else if (snode->edittree->type == NTREE_GEOMETRY) {
     get_context_path_node_geometry(C, *snode, context_path);
   }
   else if (snode->edittree->type == NTREE_SHADER) {

@@ -4,6 +4,7 @@
 add_subdirectory(composite)
 add_subdirectory(function)
 add_subdirectory(geometry)
+add_subdirectory(control)
 add_subdirectory(shader)
 add_subdirectory(texture)
 
@@ -12,6 +13,7 @@ set(INC
   composite
   function
   geometry
+  control
   intern
   shader
   texture
@@ -58,6 +60,7 @@ set(SRC
   NOD_derived_node_tree.hh
   NOD_function.h
   NOD_geometry.h
+  NOD_control.h
   NOD_geometry_exec.hh
   NOD_geometry_nodes_lazy_function.hh
   NOD_geometry_nodes_log.hh
@@ -82,6 +85,8 @@ set(LIB
   bf_nodes_composite
   bf_nodes_function
   bf_nodes_geometry
+  bf_nodes_control
+  bf_nodes
   bf_nodes_shader
   bf_nodes_texture
 )

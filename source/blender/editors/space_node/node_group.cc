@@ -73,7 +73,8 @@ static bool node_group_operator_active_poll(bContext *C)
                  "ShaderNodeTree",
                  "CompositorNodeTree",
                  "TextureNodeTree",
-                 "GeometryNodeTree")) {
+                 "GeometryNodeTree",
+                 "ControlNodeTree")) {
       return true;
     }
   }
@@ -89,7 +90,7 @@ static bool node_group_operator_editable(bContext *C)
      * Disabled otherwise to allow python-nodes define their own operators
      * with same key-map. */
     if (ED_node_is_shader(snode) || ED_node_is_compositor(snode) || ED_node_is_texture(snode) ||
-        ED_node_is_geometry(snode)) {
+        ED_node_is_geometry(snode) || ED_node_is_control(snode)) {
       return true;
     }
   }

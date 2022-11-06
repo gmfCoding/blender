@@ -3445,6 +3445,38 @@ static int geometry_node_tree_copy_assign_exec(bContext *C, wmOperator * /*op*/)
   return OPERATOR_FINISHED;
 }
 
+static int control_node_tree_copy_assign_exec(bContext *C, wmOperator * /*op*/)
+{
+  Main *bmain = CTX_data_main(C);
+  Object *ob = ED_object_active_context(C);
+  ModifierData *md = BKE_object_active_modifier(ob);
+  if (!(md && md->type == eModifierType_Nodes)) {
+    return OPERATOR_CANCELLED;
+  }
+
+  NodesModifierData *nmd = (NodesModifierData *)md;
+  bNodeTree *tree = nmd->node_group;
+  if (tree == nullptr) {
+    return OPERATOR_CANCELLED;
+  }
+
+  bNodeTree *new_tree = (bNodeTree *)BKE_id_copy_ex(
+      bmain, &tree->id, nullptr, LIB_ID_COPY_ACTIONS | LIB_ID_COPY_DEFAULT);
+
+  if (new_tree == nullptr) {
+    return OPERATOR_CANCELLED;
+  }
+
+  nmd->node_group = new_tree;
+  id_us_min(&tree->id);
+
+  DEG_id_tag_update(&ob->id, ID_RECALC_GEOMETRY);
+  DEG_relations_tag_update(bmain);
+  WM_event_add_notifier(C, NC_OBJECT | ND_MODIFIER, ob);
+  return OPERATOR_FINISHED;
+}
+
+
 void OBJECT_OT_geometry_node_tree_copy_assign(wmOperatorType *ot)
 {
   ot->name = "Copy Geometry Node Group";
@@ -3452,6 +3484,18 @@ void OBJECT_OT_geometry_node_tree_copy_assign(wmOperatorType *ot)
   ot->idname = "OBJECT_OT_geometry_node_tree_copy_assign";
 
   ot->exec = geometry_node_tree_copy_assign_exec;
+  ot->poll = ED_operator_object_active;
+
+  ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;
+}
+
+void OBJECT_OT_control_node_tree_copy_assign(wmOperatorType *ot)
+{
+  ot->name = "Copy Control Node Group";
+  ot->description = "Copy the active control node group and assign it to the active modifier";
+  ot->idname = "OBJECT_OT_control_node_tree_copy_assign";
+
+  ot->exec = control_node_tree_copy_assign_exec;
   ot->poll = ED_operator_object_active;
 
   ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;

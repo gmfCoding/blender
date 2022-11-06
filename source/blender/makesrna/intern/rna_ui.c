@@ -5,6 +5,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "DNA_screen_types.h"
 #include "DNA_space_types.h"
@@ -1470,9 +1471,10 @@ static void rna_def_panel(BlenderRNA *brna)
   RNA_def_property_string_sdna(prop, NULL, "type->owner_id");
   RNA_def_property_flag(prop, PROP_REGISTER_OPTIONAL);
   RNA_def_property_ui_text(prop, "", "The ID owning the data displayed in the panel, if any");
-
+  
   prop = RNA_def_property(srna, "bl_space_type", PROP_ENUM, PROP_NONE);
   RNA_def_property_enum_sdna(prop, NULL, "type->space_type");
+  printf("Space Type _ rna_enum_space_type_items!\n");
   RNA_def_property_enum_items(prop, rna_enum_space_type_items);
   RNA_def_property_flag(prop, PROP_REGISTER);
   RNA_def_property_ui_text(prop, "Space Type", "The space where the panel is going to be used in");

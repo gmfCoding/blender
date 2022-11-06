@@ -678,6 +678,7 @@ typedef struct bNodeTree {
 #define NTREE_COMPOSIT 1
 #define NTREE_TEXTURE 2
 #define NTREE_GEOMETRY 3
+#define NTREE_CONTROL 4
 
 /** #NodeTree.flag */
 #define NTREE_DS_EXPAND (1 << 0)            /* for animation editors */
@@ -1612,6 +1613,11 @@ typedef struct NodeGeometryDistributePointsInVolume {
   /* GeometryNodePointDistributeVolumeMode. */
   uint8_t mode;
 } NodeGeometryDistributePointsInVolume;
+
+typedef struct NodeControlFrameExec {
+  /* NodeControlFrameExec. */
+  uint8_t mode;
+} NodeControlFrameExec;
 
 typedef struct NodeFunctionCompare {
   /* NodeCompareOperation */

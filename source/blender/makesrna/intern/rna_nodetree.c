@@ -559,6 +559,7 @@ static EnumPropertyItem rna_node_geometry_mesh_circle_fill_type_items[] = {
 #  include "NOD_common.h"
 #  include "NOD_composite.h"
 #  include "NOD_geometry.h"
+#  include "NOD_control.h"
 #  include "NOD_shader.h"
 #  include "NOD_socket.h"
 #  include "NOD_texture.h"
@@ -2299,6 +2300,28 @@ static StructRNA *rna_GeometryNode_register(Main *bmain,
   return nt->rna_ext.srna;
 }
 
+static StructRNA *rna_ControlNode_register(Main *bmain,
+                                            ReportList *reports,
+                                            void *data,
+                                            const char *identifier,
+                                            StructValidateFunc validate,
+                                            StructCallbackFunc call,
+                                            StructFreeFunc free)
+{
+  bNodeType *nt = rna_Node_register_base(
+      bmain, reports, &RNA_ControlNode, data, identifier, validate, call, free);
+  if (!nt) {
+    return NULL;
+  }
+
+  nodeRegisterType(nt);
+
+  /* update while blender is running */
+  WM_main_add_notifier(NC_NODE | NA_EDITED, NULL);
+
+  return nt->rna_ext.srna;
+}
+
 static StructRNA *rna_FunctionNode_register(Main *bmain,
                                             ReportList *reports,
                                             void *data,
@@ -3401,6 +3424,36 @@ static StructRNA *rna_GeometryNodeCustomGroup_register(Main *bmain,
 }
 
 void register_node_type_geo_custom_group(bNodeType *ntype);
+
+static StructRNA *rna_ControlNodeCustomGroup_register(Main *bmain,
+                                                       ReportList *reports,
+                                                       void *data,
+                                                       const char *identifier,
+                                                       StructValidateFunc validate,
+                                                       StructCallbackFunc call,
+                                                       StructFreeFunc free)
+{
+  bNodeType *nt = rna_Node_register_base(
+      bmain, reports, &RNA_ControlNodeCustomGroup, data, identifier, validate, call, free);
+
+  if (!nt) {
+    return NULL;
+  }
+
+  nt->group_update_func = node_group_update;
+  nt->type = NODE_CUSTOM_GROUP;
+
+  register_node_type_con_custom_group(nt);
+
+  nodeRegisterType(nt);
+
+  WM_main_add_notifier(NC_NODE | NA_EDITED, NULL);
+
+  return nt->rna_ext.srna;
+}
+
+void register_node_type_con_custom_group(bNodeType *ntype);
+
 
 static StructRNA *rna_ShaderNodeCustomGroup_register(Main *bmain,
                                                      ReportList *reports,
@@ -11003,6 +11056,16 @@ static void rna_def_geometry_node(BlenderRNA *brna)
   RNA_def_struct_register_funcs(srna, "rna_GeometryNode_register", "rna_Node_unregister", NULL);
 }
 
+static void rna_def_control_node(BlenderRNA *brna)
+{
+  StructRNA *srna;
+
+  srna = RNA_def_struct(brna, "ControlNode", "NodeInternal");
+  RNA_def_struct_ui_text(srna, "Control Node", "");
+  RNA_def_struct_sdna(srna, "bNode");
+  RNA_def_struct_register_funcs(srna, "rna_ControlNode_register", "rna_Node_unregister", NULL);
+}
+
 static void rna_def_function_node(BlenderRNA *brna)
 {
   StructRNA *srna;
@@ -11728,6 +11791,21 @@ static void rna_def_node_socket_geometry(BlenderRNA *brna,
   RNA_def_struct_sdna(srna, "bNodeSocket");
 }
 
+static void rna_def_node_socket_control(BlenderRNA *brna,
+                                         const char *identifier,
+                                         const char *interface_idname)
+{
+  StructRNA *srna;
+
+  srna = RNA_def_struct(brna, identifier, "NodeSocketStandard");
+  RNA_def_struct_ui_text(srna, "Control Node Socket", "Control socket of a node");
+  RNA_def_struct_sdna(srna, "bNodeSocket");
+
+  srna = RNA_def_struct(brna, interface_idname, "NodeSocketInterfaceStandard");
+  RNA_def_struct_ui_text(srna, "Control Node Socket Interface", "Control socket of a node");
+  RNA_def_struct_sdna(srna, "bNodeSocket");
+}
+
 static void rna_def_node_socket_collection(BlenderRNA *brna,
                                            const char *identifier,
                                            const char *interface_idname)
@@ -11992,6 +12070,8 @@ static void rna_def_node_socket_standard_types(BlenderRNA *brna)
   rna_def_node_socket_image(brna, "NodeSocketImage", "NodeSocketInterfaceImage");
 
   rna_def_node_socket_geometry(brna, "NodeSocketGeometry", "NodeSocketInterfaceGeometry");
+
+  rna_def_node_socket_control(brna, "NodeSocketControl", "NodeSocketInterfaceControl");
 
   rna_def_node_socket_collection(brna, "NodeSocketCollection", "NodeSocketInterfaceCollection");
 
@@ -12648,6 +12728,7 @@ static void rna_def_nodetree(BlenderRNA *brna)
       {NTREE_TEXTURE, "TEXTURE", ICON_TEXTURE, "Texture", "Texture nodes"},
       {NTREE_COMPOSIT, "COMPOSITING", ICON_RENDERLAYERS, "Compositing", "Compositing nodes"},
       {NTREE_GEOMETRY, "GEOMETRY", ICON_GEOMETRY_NODES, "Geometry", "Geometry nodes"},
+      {NTREE_CONTROL, "CONTROL", ICON_GEOMETRY_NODES, "Control", "Control nodes"},
       {0, NULL, 0, NULL, NULL},
   };
 
@@ -12903,6 +12984,17 @@ static void rna_def_geometry_nodetree(BlenderRNA *brna)
   RNA_def_struct_ui_icon(srna, ICON_NODETREE);
 }
 
+static void rna_def_control_nodetree(BlenderRNA *brna)
+{
+  StructRNA *srna;
+
+  srna = RNA_def_struct(brna, "ControlNodeTree", "NodeTree");
+  RNA_def_struct_ui_text(
+      srna, "Control Node Tree", "Node tree consisting of linked nodes used for controling objects");
+  RNA_def_struct_sdna(srna, "bNodeTree");
+  RNA_def_struct_ui_icon(srna, ICON_NODETREE);
+}
+
 static StructRNA *define_specific_node(BlenderRNA *brna,
                                        const char *struct_name,
                                        const char *base_name,
@@ -12990,6 +13082,7 @@ void RNA_def_nodetree(BlenderRNA *brna)
   rna_def_compositor_node(brna);
   rna_def_texture_node(brna);
   rna_def_geometry_node(brna);
+  rna_def_control_node(brna);
   rna_def_function_node(brna);
 
   rna_def_nodetree(brna);
@@ -13000,7 +13093,8 @@ void RNA_def_nodetree(BlenderRNA *brna)
   rna_def_shader_nodetree(brna);
   rna_def_texture_nodetree(brna);
   rna_def_geometry_nodetree(brna);
-
+  rna_def_control_nodetree(brna);
+  
 #  define DefNode(Category, ID, DefFunc, EnumName, StructName, UIName, UIDesc) \
     { \
       srna = define_specific_node( \
@@ -13023,6 +13117,7 @@ void RNA_def_nodetree(BlenderRNA *brna)
   define_specific_node(brna, "CompositorNodeGroup", "CompositorNode", "Group", "", def_group);
   define_specific_node(brna, "TextureNodeGroup", "TextureNode", "Group", "", def_group);
   define_specific_node(brna, "GeometryNodeGroup", "GeometryNode", "Group", "", def_group);
+  define_specific_node(brna, "ControlNodeGroup", "ControlNode", "Group", "", def_group);
   def_custom_group(brna,
                    "ShaderNodeCustomGroup",
                    "ShaderNode",
@@ -13047,6 +13142,12 @@ void RNA_def_nodetree(BlenderRNA *brna)
                    "Geometry Custom Group",
                    "Custom Geometry Group Node for Python nodes",
                    "rna_GeometryNodeCustomGroup_register");
+  def_custom_group(brna,
+                   "ControlNodeCustomGroup",
+                   "ControlNode",
+                   "Control Custom Group",
+                   "Custom Control Group Node for Python nodes",
+                   "rna_ControlNodeCustomGroup_register");
 
   /* special socket types */
   rna_def_cmp_output_file_slot_file(brna);

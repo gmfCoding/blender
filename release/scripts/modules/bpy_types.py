@@ -1167,3 +1167,10 @@ class GeometryNode(NodeInternal):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'GeometryNodeTree'
+
+class ControlNode(NodeInternal):
+    __slots__ = ()
+
+    @classmethod
+    def poll(cls, ntree):
+        return ntree.bl_idname == 'ControlNodeTree'

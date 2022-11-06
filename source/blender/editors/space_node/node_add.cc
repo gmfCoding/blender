@@ -649,7 +649,7 @@ static bool node_add_file_poll(bContext *C)
 {
   const SpaceNode *snode = CTX_wm_space_node(C);
   return ED_operator_node_editable(C) &&
-         ELEM(snode->nodetree->type, NTREE_SHADER, NTREE_TEXTURE, NTREE_COMPOSIT, NTREE_GEOMETRY);
+         ELEM(snode->nodetree->type, NTREE_SHADER, NTREE_TEXTURE, NTREE_COMPOSIT, NTREE_GEOMETRY, NTREE_CONTROL);
 }
 
 static int node_add_file_exec(bContext *C, wmOperator *op)
